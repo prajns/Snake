@@ -286,7 +286,7 @@ const controller = (function (snakeCtrl, UICtrl) {
     };	
 
     const setupEventListeners = function () {
-        var DOM = UICtrl.getDOMstrings();
+        const DOM = UICtrl.getDOMstrings();
 
         document.querySelector(DOM.btnRestart).addEventListener('click', () => { location.reload() });
 
