@@ -133,3 +133,8 @@ a:visited {
 .link__github:active {
     color: #fff;
 }
+
+.link__gitlab:hover,
+.link__gitlab:active {
+    color: #d35400;
+}
