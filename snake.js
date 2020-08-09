@@ -1,5 +1,5 @@
-//SNAKE CONTROLLER
-const snakeController = (function () {
+//SNAKE snakeController
+const snakeModel = (function () {
     let data = {
         gridCells: 17,
         length: 3,
@@ -67,26 +67,26 @@ const snakeController = (function () {
             for (let i = 0 ; i < data.gridCells ; i++) {
                 if (i == 0 || i == data.gridCells - 1) {
                     for (let j = 0 ; j < data.gridCells ; j++) {
-                        if (!data.tab[j]) { 
-                            data.tab[j] = []; 
+                        if (!data.tab[j]) {
+                            data.tab[j] = [];
                         }
                         data.tab[i][j] = -2;
                     }	
                 } else {
                     for (let j = 0 ; j < data.gridCells ; j++) {
                         if (j == 0 || j == data.gridCells-1) {
-                            if (!data.tab[j]) { 
-                                data.tab[j] = []; 
+                            if (!data.tab[j]) {
+                                data.tab[j] = [];
                             }
                             data.tab[i][j] = -2;
                         } else {
-                            if (!data.tab[j]) { 
-                                data.tab[j] = []; 
+                            if (!data.tab[j]) {
+                                data.tab[j] = [];
                             }
-                            data.tab[i][j] = 0;						
+                            data.tab[i][j] = 0;
                         }
                     }
-                }					
+                }
             }
 
             //Randomize and set snake starting position	
@@ -186,8 +186,8 @@ const snakeController = (function () {
 
 })();
 
-//UI CONTROLLER
-const UIController = (function (snakeCtrl) {
+//UI snakeController
+const snakeView = (function () {
 
     const DOMstrings = {
         btnRestart: '.btn--restart',
@@ -254,20 +254,20 @@ const UIController = (function (snakeCtrl) {
         },
 
         //Set the background color of each grid's field
-        stylize: function (gridCells) {
+        stylize: function (gridCells, cellValue) {
             for(let i = 0; i < gridCells; i++) {
                 for(let j = 0; j < gridCells; j++) {
-                    document.querySelector(`#d_${i}_${j}`).innerHTML = snakeCtrl.getData().tab[i][j];
+                    document.querySelector(`#d_${i}_${j}`).innerHTML = cellValue.tab[i][j];
                     
-                    if(snakeCtrl.getData().tab[i][j] == -2) {
+                    if(cellValue.tab[i][j] == -2) {
                         document.querySelector(`#d_${i}_${j}`).style.backgroundColor="#2f3640";
-                    }else if(snakeCtrl.getData().tab[i][j] == -1) {
+                    }else if(cellValue.tab[i][j] == -1) {
                         document.querySelector(`#d_${i}_${j}`).style.backgroundColor="#e84118";
-                    }else if(snakeCtrl.getData().tab[i][j] == 1) {
+                    }else if(cellValue.tab[i][j] == 1) {
                         document.querySelector(`#d_${i}_${j}`).style.backgroundColor="#44bd32";
-                    }else if(snakeCtrl.getData().tab[i][j] == 0) {
+                    }else if(cellValue.tab[i][j] == 0) {
                         document.querySelector(`#d_${i}_${j}`).style.backgroundColor="#f5f6fa";
-                    }else if(snakeCtrl.getData().tab[i][j] > 1) {
+                    }else if(cellValue.tab[i][j] > 1) {
                         document.querySelector(`#d_${i}_${j}`).style.backgroundColor="#4cd137";
                     }
                 }
@@ -275,57 +275,57 @@ const UIController = (function (snakeCtrl) {
         }
     }
 
-})(snakeController);
+})();
 
-//GLOBAL APP CONTROLLER
-const controller = (function (snakeCtrl, UICtrl) {
+//GLOBAL APP Controller
+const snakeController = (function (snakeModel, snakeView) {
 
-    let variables = {
+    let ctrlVars = {
         snake : null,
         direction: "start"
     };	
 
     const setupEventListeners = function () {
-        const DOM = UICtrl.getDOMstrings();
+        const DOM = snakeView.getDOMstrings();
 
         document.querySelector(DOM.btnRestart).addEventListener('click', () => { location.reload() });
 
         document.addEventListener('keypress', keyBinding);
-        window.addEventListener('resize', () => UICtrl.updateGrid(17));
+        window.addEventListener('resize', () => snakeView.updateGrid(17));
     };
 
     const keyBinding = function (event) {
-        if ((event.key === "a" && variables.direction != "right") || (event.which === 65 && variables.direction != "right")) {
-            variables.direction = "left";
-        } else if ((event.key === "w" && variables.direction != "down") || (event.which === 87 && variables.direction != "down")) {
-            variables.direction = "up";
-        } else if ((event.key === "d" && variables.direction != "left") || (event.which === 68 && variables.direction != "left")) {
-            variables.direction = "right";
-        } else if ((event.key === "s" && variables.direction != "up") || (event.which === 83 && variables.direction != "up")) {
-            variables.direction = "down";
+        if ((event.key === "a" && ctrlVars.direction != "right") || (event.which === 65 && ctrlVars.direction != "right")) {
+            ctrlVars.direction = "left";
+        } else if ((event.key === "w" && ctrlVars.direction != "down") || (event.which === 87 && ctrlVars.direction != "down")) {
+            ctrlVars.direction = "up";
+        } else if ((event.key === "d" && ctrlVars.direction != "left") || (event.which === 68 && ctrlVars.direction != "left")) {
+            ctrlVars.direction = "right";
+        } else if ((event.key === "s" && ctrlVars.direction != "up") || (event.which === 83 && ctrlVars.direction != "up")) {
+            ctrlVars.direction = "down";
         }
     };
 
     const startGame = function () {
-        if (variables.direction == "start") {
-            variables.snake = setInterval(function() {
-                snakeCtrl.crawl(variables.direction, variables.snake);
-                UICtrl.stylize(17);
+        if (ctrlVars.direction == "start") {
+            ctrlVars.snake = setInterval(function() {
+                snakeModel.crawl(ctrlVars.direction, ctrlVars.snake);
+                snakeView.stylize(17, snakeModel.getData());
             }, 130);
-            variables.direction = "started";
+            ctrlVars.direction = "started";
         }
     };
 
     return {
         init: function() {
-            snakeCtrl.tabInitialize();
-            UICtrl.showGrid(17);
-            UICtrl.stylize(17);
+            snakeModel.tabInitialize();
+            snakeView.showGrid(17);
+            snakeView.stylize(17, snakeModel.getData());
             setupEventListeners();
             startGame();
         }
     }
 
-})(snakeController, UIController);
+})(snakeModel, snakeView);
 
-controller.init();
+snakeController.init();
